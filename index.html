@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="一个简洁的个人待办事项页面，支持添加、编辑、筛选、优先级和本地保存。"
+    />
+    <title>个人待办事项</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="page-frame" aria-hidden="true">
+      <span class="paper-mark paper-mark-one"></span>
+      <span class="paper-mark paper-mark-two"></span>
+    </div>
+
+    <main class="todo-app" aria-labelledby="app-title">
+      <header class="todo-header">
+        <div>
+          <p class="eyebrow">Today Board</p>
+          <h1 id="app-title">个人待办事项</h1>
+          <p class="header-copy">记录今天要做的事，按轻重缓急清楚推进。</p>
+        </div>
+        <dl class="todo-stats" aria-label="任务统计">
+          <div>
+            <dt>全部</dt>
+            <dd id="total-count">0</dd>
+          </div>
+          <div>
+            <dt>未完成</dt>
+            <dd id="active-count">0</dd>
+          </div>
+          <div>
+            <dt>已完成</dt>
+            <dd id="completed-count">0</dd>
+          </div>
+        </dl>
+      </header>
+
+      <section class="todo-input" aria-label="添加任务">
+        <div class="section-heading">
+          <h2>添加任务</h2>
+          <p>先写下最重要的一件事。</p>
+        </div>
+        <form class="todo-form" id="todo-form">
+          <label class="visually-hidden" for="todo-title">任务内容</label>
+          <input
+            id="todo-title"
+            class="todo-title-input"
+            type="text"
+            placeholder="添加一个新的待办事项"
+            autocomplete="off"
+            maxlength="80"
+          />
+
+          <label class="visually-hidden" for="todo-priority">任务优先级</label>
+          <select id="todo-priority" class="todo-priority-select">
+            <option value="high">高</option>
+            <option value="medium" selected>中</option>
+            <option value="low">低</option>
+          </select>
+
+          <button class="primary-button" type="submit">添加</button>
+        </form>
+        <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section class="todo-filter" aria-label="筛选任务">
+        <button class="filter-button active" type="button" data-filter="all">全部</button>
+        <button class="filter-button" type="button" data-filter="active">未完成</button>
+        <button class="filter-button" type="button" data-filter="completed">已完成</button>
+      </section>
+
+      <section class="todo-list-section" aria-label="任务列表">
+        <div class="section-heading list-heading">
+          <h2>任务列表</h2>
+          <p id="list-summary">暂无任务</p>
+        </div>
+        <ul class="todo-list" id="todo-list"></ul>
+        <div class="empty-state" id="empty-state" hidden>
+          <h2>暂无待办事项</h2>
+          <p>添加一个任务开始规划今天吧。</p>
+        </div>
+      </section>
+    </main>
+
+    <script src="/js/main.js" type="module"></script>
+  </body>
+</html>
