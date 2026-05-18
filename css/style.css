@@ -481,6 +481,10 @@ h1 {
   color: var(--muted);
 }
 
+.empty-state[hidden] {
+  display: none;
+}
+
 .visually-hidden {
   position: absolute;
   width: 1px;
