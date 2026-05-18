@@ -13,6 +13,7 @@ const priorityLabels = {
 const todoForm = document.querySelector("#todo-form");
 const todoTitleInput = document.querySelector("#todo-title");
 const todoPrioritySelect = document.querySelector("#todo-priority");
+const todoDueDateInput = document.querySelector("#todo-due-date");
 const todoListElement = document.querySelector("#todo-list");
 const emptyState = document.querySelector("#empty-state");
 const formMessage = document.querySelector("#form-message");
@@ -58,6 +59,24 @@ function getFormattedTime() {
   return formatter.format(now).replace(/\//g, "-");
 }
 
+function getTodayDateValue() {
+  const today = new Date();
+  const timezoneOffset = today.getTimezoneOffset() * 60000;
+  return new Date(today.getTime() - timezoneOffset).toISOString().slice(0, 10);
+}
+
+function formatDueDate(dueDate) {
+  if (!dueDate) {
+    return "未设置截止日期";
+  }
+
+  return `截止 ${dueDate}`;
+}
+
+function isOverdue(todo) {
+  return Boolean(todo.dueDate && !todo.completed && todo.dueDate < getTodayDateValue());
+}
+
 function getVisibleTodos() {
   const filteredTodos = todoList.filter((todo) => {
     if (currentFilter === "active") {
@@ -79,6 +98,14 @@ function getVisibleTodos() {
     const priorityDifference = priorityOrder[a.priority] - priorityOrder[b.priority];
     if (priorityDifference !== 0) {
       return priorityDifference;
+    }
+
+    if (a.dueDate && b.dueDate && a.dueDate !== b.dueDate) {
+      return a.dueDate.localeCompare(b.dueDate);
+    }
+
+    if (a.dueDate !== b.dueDate) {
+      return a.dueDate ? -1 : 1;
     }
 
     return b.id - a.id;
@@ -104,6 +131,10 @@ function createTodoItem(todo) {
 
   if (todo.completed) {
     item.classList.add("completed");
+  }
+
+  if (isOverdue(todo)) {
+    item.classList.add("overdue");
   }
 
   const checkbox = document.createElement("input");
@@ -137,7 +168,16 @@ function createTodoItem(todo) {
   const createdAt = document.createElement("span");
   createdAt.textContent = todo.createdAt;
 
-  meta.append(priorityTag, createdAt);
+  const dueDate = document.createElement("span");
+  dueDate.className = "due-date";
+  dueDate.textContent = formatDueDate(todo.dueDate);
+
+  if (isOverdue(todo)) {
+    dueDate.classList.add("overdue");
+    dueDate.textContent = `${formatDueDate(todo.dueDate)} · 已逾期`;
+  }
+
+  meta.append(priorityTag, dueDate, createdAt);
   content.append(title, meta);
   item.append(content, createActions(todo, false));
 
@@ -214,16 +254,24 @@ function addTodo(event) {
     return;
   }
 
+  if (!todoDueDateInput.value) {
+    showMessage("请选择任务的截止日期。");
+    todoDueDateInput.focus();
+    return;
+  }
+
   todoList.push({
     id: Date.now(),
     title,
     completed: false,
     priority: todoPrioritySelect.value,
+    dueDate: todoDueDateInput.value,
     createdAt: getFormattedTime(),
   });
 
   todoTitleInput.value = "";
   todoPrioritySelect.value = "medium";
+  todoDueDateInput.value = "";
   showMessage("");
   saveTodos();
   renderTodos();
@@ -329,4 +377,5 @@ filterButtons.forEach((button) => {
   button.addEventListener("click", () => setFilter(button.dataset.filter));
 });
 
+todoDueDateInput.min = getTodayDateValue();
 setFilter(currentFilter);

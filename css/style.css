@@ -225,13 +225,14 @@ h1 {
 
 .todo-form {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 112px 96px;
+  grid-template-columns: minmax(0, 1fr) 112px 190px 96px;
   gap: 12px;
   align-items: center;
 }
 
 .todo-title-input,
 .todo-priority-select,
+.todo-due-date-input,
 .edit-input {
   width: 100%;
   border: 1px solid var(--line-strong);
@@ -246,17 +247,55 @@ h1 {
 }
 
 .todo-title-input,
-.todo-priority-select {
+.todo-priority-select,
+.todo-due-date-input {
   min-height: 50px;
   padding: 0 15px;
 }
 
 .todo-title-input:focus,
 .todo-priority-select:focus,
+.todo-due-date-input:focus,
 .edit-input:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 4px rgba(36, 92, 79, 0.14);
   transform: translateY(-1px);
+}
+
+.due-date-field {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+  min-width: 190px;
+  min-height: 50px;
+  padding-left: 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--paper-strong);
+}
+
+.due-date-field span {
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 800;
+}
+
+.due-date-field:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 4px rgba(36, 92, 79, 0.14);
+  transform: translateY(-1px);
+}
+
+.due-date-field .todo-due-date-input {
+  border: 0;
+  min-height: 48px;
+  padding-left: 0;
+}
+
+.due-date-field .todo-due-date-input:focus {
+  box-shadow: none;
+  transform: none;
 }
 
 .primary-button,
@@ -366,6 +405,10 @@ h1 {
   background: #fbf9f3;
 }
 
+.todo-item.overdue {
+  border-color: rgba(181, 70, 50, 0.26);
+}
+
 .todo-checkbox {
   width: 22px;
   height: 22px;
@@ -416,6 +459,24 @@ h1 {
 .priority-tag.priority-low {
   background: var(--low-soft);
   color: var(--low);
+}
+
+.due-date {
+  display: inline-flex;
+  align-items: center;
+  min-height: 25px;
+  padding: 0 10px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.78);
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.due-date.overdue {
+  border-color: rgba(181, 70, 50, 0.28);
+  background: var(--danger-soft);
+  color: var(--danger);
 }
 
 .todo-actions {

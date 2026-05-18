@@ -62,6 +62,17 @@
             <option value="low">低</option>
           </select>
 
+          <label class="due-date-field" for="todo-due-date">
+            <span>截止</span>
+            <input
+              id="todo-due-date"
+              class="todo-due-date-input"
+              type="date"
+              aria-label="截止日期"
+              required
+            />
+          </label>
+
           <button class="primary-button" type="submit">添加</button>
         </form>
         <p class="form-message" id="form-message" role="status" aria-live="polite"></p>
