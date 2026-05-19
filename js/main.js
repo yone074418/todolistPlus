@@ -1,4 +1,5 @@
 import { filterTodosBySearch } from "./todoSearch.js";
+import { ensureTodoOrder, reorderVisibleTodos, sortTodosByOrder } from "./todoOrdering.js";
 
 const STORAGE_KEY = "todoList";
 const priorityOrder = {
@@ -26,10 +27,11 @@ const activeCount = document.querySelector("#active-count");
 const completedCount = document.querySelector("#completed-count");
 const listSummary = document.querySelector("#list-summary");
 
-let todoList = loadTodos();
+let todoList = ensureTodoOrder(loadTodos(), compareTodosByDefault);
 let currentFilter = "all";
 let currentSearchQuery = "";
 let editingTodoId = null;
+let draggedTodoId = null;
 
 const routes = {
   "/": renderTodos,
@@ -47,6 +49,35 @@ function loadTodos() {
 
 function saveTodos() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todoList));
+}
+
+function compareTodosByDefault(a, b) {
+  if (a.completed !== b.completed) {
+    return Number(a.completed) - Number(b.completed);
+  }
+
+  const priorityDifference = priorityOrder[a.priority] - priorityOrder[b.priority];
+  if (priorityDifference !== 0) {
+    return priorityDifference;
+  }
+
+  if (a.dueDate && b.dueDate && a.dueDate !== b.dueDate) {
+    return a.dueDate.localeCompare(b.dueDate);
+  }
+
+  if (a.dueDate !== b.dueDate) {
+    return a.dueDate ? -1 : 1;
+  }
+
+  return b.id - a.id;
+}
+
+function getNextTodoOrder() {
+  if (!todoList.length) {
+    return 0;
+  }
+
+  return Math.max(...todoList.map((todo) => todo.order ?? 0)) + 1;
 }
 
 function getFormattedTime() {
@@ -96,26 +127,7 @@ function getVisibleTodos() {
 
   const searchedTodos = filterTodosBySearch(filteredTodos, currentSearchQuery);
 
-  return [...searchedTodos].sort((a, b) => {
-    if (a.completed !== b.completed) {
-      return Number(a.completed) - Number(b.completed);
-    }
-
-    const priorityDifference = priorityOrder[a.priority] - priorityOrder[b.priority];
-    if (priorityDifference !== 0) {
-      return priorityDifference;
-    }
-
-    if (a.dueDate && b.dueDate && a.dueDate !== b.dueDate) {
-      return a.dueDate.localeCompare(b.dueDate);
-    }
-
-    if (a.dueDate !== b.dueDate) {
-      return a.dueDate ? -1 : 1;
-    }
-
-    return b.id - a.id;
-  });
+  return sortTodosByOrder(searchedTodos);
 }
 
 function renderTodos() {
@@ -134,6 +146,7 @@ function createTodoItem(todo) {
   const item = document.createElement("li");
   item.className = `todo-item priority-${todo.priority}`;
   item.dataset.id = todo.id;
+  const isEditing = editingTodoId === todo.id;
 
   if (todo.completed) {
     item.classList.add("completed");
@@ -141,6 +154,16 @@ function createTodoItem(todo) {
 
   if (isOverdue(todo)) {
     item.classList.add("overdue");
+  }
+
+  if (!isEditing) {
+    item.draggable = true;
+    item.setAttribute("aria-grabbed", "false");
+    item.addEventListener("dragstart", (event) => handleDragStart(event, todo.id, item));
+    item.addEventListener("dragover", (event) => handleDragOver(event, todo.id, item));
+    item.addEventListener("dragleave", (event) => handleDragLeave(event, item));
+    item.addEventListener("drop", (event) => handleDrop(event, todo.id, item));
+    item.addEventListener("dragend", () => handleDragEnd(item));
   }
 
   const checkbox = document.createElement("input");
@@ -152,7 +175,7 @@ function createTodoItem(todo) {
 
   item.append(checkbox);
 
-  if (editingTodoId === todo.id) {
+  if (isEditing) {
     item.append(createEditForm(todo), createActions(todo, true));
     return item;
   }
@@ -273,6 +296,7 @@ function addTodo(event) {
     priority: todoPrioritySelect.value,
     dueDate: todoDueDateInput.value,
     createdAt: getFormattedTime(),
+    order: getNextTodoOrder(),
   });
 
   todoTitleInput.value = "";
@@ -324,6 +348,56 @@ function cancelEditing() {
   editingTodoId = null;
   showMessage("");
   renderTodos();
+}
+
+function handleDragStart(event, id, item) {
+  draggedTodoId = id;
+  item.classList.add("dragging");
+  item.setAttribute("aria-grabbed", "true");
+  event.dataTransfer.effectAllowed = "move";
+  event.dataTransfer.setData("text/plain", String(id));
+}
+
+function handleDragOver(event, targetId, item) {
+  if (!draggedTodoId || draggedTodoId === targetId) {
+    return;
+  }
+
+  event.preventDefault();
+  event.dataTransfer.dropEffect = "move";
+  item.classList.add("drop-target");
+}
+
+function handleDragLeave(event, item) {
+  if (!item.contains(event.relatedTarget)) {
+    item.classList.remove("drop-target");
+  }
+}
+
+function handleDrop(event, targetId, item) {
+  event.preventDefault();
+  item.classList.remove("drop-target");
+
+  const transferredId = Number(event.dataTransfer.getData("text/plain"));
+  const sourceId = draggedTodoId || transferredId;
+
+  if (!sourceId || sourceId === targetId) {
+    return;
+  }
+
+  todoList = reorderVisibleTodos(todoList, getVisibleTodos(), sourceId, targetId);
+  draggedTodoId = null;
+  saveTodos();
+  renderTodos();
+}
+
+function handleDragEnd(item) {
+  draggedTodoId = null;
+  item.classList.remove("dragging");
+  item.setAttribute("aria-grabbed", "false");
+  todoListElement.querySelectorAll(".drop-target").forEach((target) => {
+    target.classList.remove("drop-target");
+  });
 }
 
 function setFilter(filter) {
@@ -391,4 +465,7 @@ filterButtons.forEach((button) => {
 });
 
 todoDueDateInput.min = getTodayDateValue();
+if (todoList.length) {
+  saveTodos();
+}
 setFilter(currentFilter);
