@@ -1,5 +1,6 @@
 import { filterTodosBySearch } from "./todoSearch.js";
 import { ensureTodoOrder, reorderVisibleTodos, sortTodosByOrder } from "./todoOrdering.js";
+import { DARK_THEME, LIGHT_THEME, THEME_STORAGE_KEY, getStoredTheme, getToggledTheme } from "./themeMode.js";
 
 const STORAGE_KEY = "todoList";
 const priorityOrder = {
@@ -26,12 +27,14 @@ const totalCount = document.querySelector("#total-count");
 const activeCount = document.querySelector("#active-count");
 const completedCount = document.querySelector("#completed-count");
 const listSummary = document.querySelector("#list-summary");
+const themeToggle = document.querySelector("#theme-toggle");
 
 let todoList = ensureTodoOrder(loadTodos(), compareTodosByDefault);
 let currentFilter = "all";
 let currentSearchQuery = "";
 let editingTodoId = null;
 let draggedTodoId = null;
+let currentTheme = getStoredTheme();
 
 const routes = {
   "/": renderTodos,
@@ -49,6 +52,31 @@ function loadTodos() {
 
 function saveTodos() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(todoList));
+}
+
+function applyTheme(theme) {
+  currentTheme = theme === DARK_THEME ? DARK_THEME : LIGHT_THEME;
+  document.body.dataset.theme = currentTheme;
+
+  if (themeToggle) {
+    const isDark = currentTheme === DARK_THEME;
+    themeToggle.textContent = isDark ? "白天模式" : "夜晚模式";
+    themeToggle.setAttribute("aria-pressed", String(isDark));
+  }
+}
+
+function saveTheme(theme) {
+  try {
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+  } catch {
+    // Theme persistence is optional; the UI can still switch for this session.
+  }
+}
+
+function toggleTheme() {
+  const nextTheme = getToggledTheme(currentTheme);
+  applyTheme(nextTheme);
+  saveTheme(nextTheme);
 }
 
 function compareTodosByDefault(a, b) {
@@ -458,6 +486,7 @@ function handleRouteChange() {
 
 todoForm.addEventListener("submit", addTodo);
 todoSearchInput.addEventListener("input", (event) => setSearchQuery(event.target.value));
+themeToggle?.addEventListener("click", toggleTheme);
 window.addEventListener("hashchange", handleRouteChange);
 
 filterButtons.forEach((button) => {
@@ -465,6 +494,7 @@ filterButtons.forEach((button) => {
 });
 
 todoDueDateInput.min = getTodayDateValue();
+applyTheme(currentTheme);
 if (todoList.length) {
   saveTodos();
 }

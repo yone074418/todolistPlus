@@ -2,7 +2,7 @@
 
 ## 项目状态
 
-`todolistPlus` 第一版已完成。当前项目是一个 Vite 驱动的纯前端个人待办事项应用，使用原生 HTML、CSS、JavaScript 和 `localStorage`，没有后端、数据库或前端框架。
+`todolistPlus` 当前是一个 Vite 驱动的纯前端个人待办事项应用，使用原生 HTML、CSS、JavaScript 和 `localStorage`，没有后端、数据库或前端框架。
 
 ## 已落地功能
 
@@ -15,15 +15,16 @@
 - 根据任务标题进行实时搜索
 - 拖拽当前可见任务调整顺序，顺序保存到本地
 - 顶部统计全部、未完成、已完成数量
+- 点击按钮切换夜晚模式，并保存主题偏好
 - 空状态、表单消息和响应式布局
-- 搜索与排序逻辑已有 `node:test` 单元测试
+- 搜索、排序与主题逻辑已有 `node:test` 单元测试
 
 ## 技术栈
 
 - HTML：页面结构，入口文件是 `index.html`
-- CSS：页面视觉和响应式布局，样式文件是 `css/style.css`
+- CSS：页面视觉、优先级视觉、拖拽态、夜晚模式和响应式布局，样式文件是 `css/style.css`
 - JavaScript modules：页面交互和工具函数
-- localStorage：保存任务数据
+- localStorage：保存任务数据和主题偏好
 - Vite：本地开发、构建和预览
 - node:test：轻量单元测试
 
@@ -31,12 +32,14 @@
 
 ```text
 index.html              页面结构和 DOM 挂载点
-css/style.css           页面样式、优先级视觉、拖拽态和响应式布局
-js/main.js              应用主逻辑、DOM 事件、localStorage 和渲染
+css/style.css           页面样式、优先级视觉、拖拽态、夜晚模式和响应式布局
+js/main.js              应用主逻辑、DOM 事件、localStorage、主题切换和渲染
+js/themeMode.js         主题读取、切换和判断工具函数
 js/todoSearch.js        任务标题搜索工具函数
 js/todoOrdering.js      初始化排序、按 order 排序、拖拽重排工具函数
 tests/search.test.mjs   搜索逻辑测试
 tests/ordering.test.mjs 排序和拖拽重排逻辑测试
+tests/themeMode.test.mjs 主题逻辑测试
 README.md               用户和仓库首页说明
 PRD.md                  产品需求说明
 TECH_DESIGN.md          技术设计说明
@@ -70,7 +73,7 @@ TECH_DESIGN.md          技术设计说明
 | createdAt | String | 创建时间展示文本 |
 | order | Number | 手动排序顺序 |
 
-任务数据保存在 `localStorage` 的 `todoList` 键中。
+任务数据保存在 `localStorage` 的 `todoList` 键中。主题偏好保存在 `localStorage` 的 `todoTheme` 键中，取值为 `light` 或 `dark`。
 
 ## 开发约定
 
@@ -95,6 +98,5 @@ npm run preview
 
 - 分类管理
 - 任务备注
-- 深色模式
 - 数据导出
 - 后端同步、登录和多设备同步

@@ -19,6 +19,27 @@
   --shadow: 0 24px 70px rgba(52, 43, 31, 0.14);
 }
 
+body[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #f4f1ea;
+  --muted: #b7b0a7;
+  --paper: #0c0c0c;
+  --paper-strong: #161616;
+  --paper-soft: #25231f;
+  --line: #34312c;
+  --line-strong: #514b43;
+  --accent: #78b9a8;
+  --accent-dark: #a5d9cb;
+  --accent-soft: #18342d;
+  --danger: #f08c74;
+  --danger-soft: #3b1f1a;
+  --medium: #8db4f0;
+  --medium-soft: #172943;
+  --low: #c7c0b2;
+  --low-soft: #2d2a24;
+  --shadow: 0 24px 70px rgba(0, 0, 0, 0.46);
+}
+
 * {
   box-sizing: border-box;
 }
@@ -37,6 +58,14 @@ body {
     "LXGW WenKai", "Kaiti SC", "STKaiti", "PingFang SC", "Microsoft YaHei", sans-serif;
 }
 
+body[data-theme="dark"] {
+  background:
+    linear-gradient(90deg, rgba(244, 241, 234, 0.05) 1px, transparent 1px) 0 0 / 42px 42px,
+    linear-gradient(rgba(244, 241, 234, 0.04) 1px, transparent 1px) 0 0 / 42px 42px,
+    radial-gradient(circle at 14% 18%, rgba(120, 185, 168, 0.18), transparent 30%),
+    linear-gradient(135deg, #020202 0%, #10100e 52%, #050505 100%);
+}
+
 body::before {
   position: fixed;
   inset: 0;
@@ -47,6 +76,12 @@ body::before {
     radial-gradient(rgba(32, 33, 36, 0.05) 1px, transparent 1px),
     linear-gradient(110deg, rgba(255, 255, 255, 0.52), transparent 42%);
   background-size: 14px 14px, 100% 100%;
+}
+
+body[data-theme="dark"]::before {
+  background-image:
+    radial-gradient(rgba(244, 241, 234, 0.07) 1px, transparent 1px),
+    linear-gradient(110deg, rgba(255, 255, 255, 0.08), transparent 42%);
 }
 
 button,
@@ -146,6 +181,44 @@ h1 {
   color: var(--muted);
   font-size: 1.05rem;
   line-height: 1.7;
+}
+
+.theme-toggle {
+  min-height: 40px;
+  margin-top: 18px;
+  padding: 0 16px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--paper-strong);
+  font-weight: 800;
+  box-shadow: 0 12px 28px rgba(52, 43, 31, 0.11);
+  transition:
+    background 0.16s ease,
+    border-color 0.16s ease,
+    color 0.16s ease,
+    transform 0.16s ease;
+}
+
+.theme-toggle:hover {
+  transform: translateY(-1px);
+}
+
+body[data-theme="dark"] .theme-toggle {
+  background: #f4f1ea;
+  color: #10100e;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.34);
+}
+
+body[data-theme="dark"] .eyebrow,
+body[data-theme="dark"] .todo-stats div,
+body[data-theme="dark"] .todo-input,
+body[data-theme="dark"] .todo-list-section,
+body[data-theme="dark"] .filter-button,
+body[data-theme="dark"] .todo-search-field {
+  border-color: var(--line);
+  background: rgba(22, 22, 22, 0.9);
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.32);
 }
 
 .todo-stats {
@@ -354,7 +427,7 @@ h1 {
 
 .filter-button.active {
   background: var(--ink);
-  color: #ffffff;
+  color: var(--paper-strong);
 }
 
 .todo-search-field {
@@ -462,7 +535,7 @@ h1 {
 
 .todo-item.priority-low {
   border-left-color: #a49d8d;
-  background: #fbf9f3;
+  background: var(--paper);
 }
 
 .todo-item.overdue {
@@ -539,6 +612,10 @@ h1 {
   color: var(--danger);
 }
 
+body[data-theme="dark"] .due-date {
+  background: rgba(12, 12, 12, 0.78);
+}
+
 .todo-actions {
   display: flex;
   gap: 8px;
@@ -558,13 +635,17 @@ h1 {
   background: #e9dec9;
 }
 
+body[data-theme="dark"] .action-button:hover {
+  background: #34312c;
+}
+
 .action-button.delete:hover {
   background: var(--danger-soft);
   color: var(--danger);
 }
 
 .todo-item.completed .todo-title {
-  color: #97918a;
+  color: var(--muted);
   text-decoration: line-through;
 }
 
