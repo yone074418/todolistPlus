@@ -1,3 +1,5 @@
+import { filterTodosBySearch } from "./todoSearch.js";
+
 const STORAGE_KEY = "todoList";
 const priorityOrder = {
   high: 1,
@@ -14,6 +16,7 @@ const todoForm = document.querySelector("#todo-form");
 const todoTitleInput = document.querySelector("#todo-title");
 const todoPrioritySelect = document.querySelector("#todo-priority");
 const todoDueDateInput = document.querySelector("#todo-due-date");
+const todoSearchInput = document.querySelector("#todo-search");
 const todoListElement = document.querySelector("#todo-list");
 const emptyState = document.querySelector("#empty-state");
 const formMessage = document.querySelector("#form-message");
@@ -25,6 +28,7 @@ const listSummary = document.querySelector("#list-summary");
 
 let todoList = loadTodos();
 let currentFilter = "all";
+let currentSearchQuery = "";
 let editingTodoId = null;
 
 const routes = {
@@ -90,7 +94,9 @@ function getVisibleTodos() {
     return true;
   });
 
-  return [...filteredTodos].sort((a, b) => {
+  const searchedTodos = filterTodosBySearch(filteredTodos, currentSearchQuery);
+
+  return [...searchedTodos].sort((a, b) => {
     if (a.completed !== b.completed) {
       return Number(a.completed) - Number(b.completed);
     }
@@ -333,6 +339,12 @@ function setFilter(filter) {
   renderTodos();
 }
 
+function setSearchQuery(query) {
+  currentSearchQuery = query;
+  editingTodoId = null;
+  renderTodos();
+}
+
 function showMessage(message) {
   formMessage.textContent = message;
 }
@@ -371,6 +383,7 @@ function handleRouteChange() {
 }
 
 todoForm.addEventListener("submit", addTodo);
+todoSearchInput.addEventListener("input", (event) => setSearchQuery(event.target.value));
 window.addEventListener("hashchange", handleRouteChange);
 
 filterButtons.forEach((button) => {

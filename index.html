@@ -79,9 +79,21 @@
       </section>
 
       <section class="todo-filter" aria-label="筛选任务">
-        <button class="filter-button active" type="button" data-filter="all">全部</button>
-        <button class="filter-button" type="button" data-filter="active">未完成</button>
-        <button class="filter-button" type="button" data-filter="completed">已完成</button>
+        <div class="filter-buttons">
+          <button class="filter-button active" type="button" data-filter="all">全部</button>
+          <button class="filter-button" type="button" data-filter="active">未完成</button>
+          <button class="filter-button" type="button" data-filter="completed">已完成</button>
+        </div>
+        <label class="todo-search-field" for="todo-search">
+          <span>搜索</span>
+          <input
+            id="todo-search"
+            class="todo-search-input"
+            type="search"
+            placeholder="输入任务中的字符"
+            autocomplete="off"
+          />
+        </label>
       </section>
 
       <section class="todo-list-section" aria-label="任务列表">
